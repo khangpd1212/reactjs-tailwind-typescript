@@ -10,7 +10,7 @@ class servicesProduct {
   create(product: Product){
     return set(dbRef, product)
   };
-  update(updates: object){
+  update(updates: Partial<Product>){
     return update(dbRef, updates)
   };
   delete(key: number){

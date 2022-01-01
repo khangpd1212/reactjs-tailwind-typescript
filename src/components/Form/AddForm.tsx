@@ -2,20 +2,21 @@
 import { Dialog, Transition, Listbox } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-
+import ComponentInput from "./ComponentInput";
+import ComponentSelect from "./ComponentSelect";
 const people = [
-  { id: 1, name: 'Durward Reynolds', unavailable: false },
-  { id: 2, name: 'Kenton Towne', unavailable: false },
-  { id: 3, name: 'Therese Wunsch', unavailable: false },
-  { id: 4, name: 'Benedict Kessler', unavailable: true },
-  { id: 5, name: 'Katelyn Rohan', unavailable: false },
+  { id: 1, name: 'Durward Reynolds', status: false },
+  { id: 2, name: 'Kenton Towne', status: false },
+  { id: 3, name: 'Therese Wunsch', status: false },
+  { id: 4, name: 'Benedict Kessler', status: true },
+  { id: 5, name: 'Katelyn Rohan', status: false },
 ]
 
 export default function AddForm() {
   const [open, setOpen] = useState(false);
 
   const [selected, setSelected] = useState(people[0]);
-  
+
   const handleShowModal = () => {
     setOpen(true);
   };
@@ -65,107 +66,17 @@ export default function AddForm() {
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <div className="p-10 inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="mb-6 w-full">
-                  <label
-                    htmlFor="input-name"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="input-name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-offset-0 focus:ring-blue-500 focus:outline-blue-500 block w-full p-2.5"
-                  />
-                </div>
+                <ComponentInput title="Name" typeInput="text" placehoder="Please input product name" />
 
                 <div className="flex justify-around gap-4">
-                  <div className="mb-6 w-full">
-                    <label
-                      htmlFor="input-catalog"
-                      className="block mb-2 text-sm font-medium text-gray-900"
-                    >
-                      Catalog
-                    </label>
-                    <Listbox value={selected} onChange={setSelected}>
-                      <div className="relative" id="input-catalog">
-                        <Listbox.Button className="relative w-full p-2.5 text-left bg-gray-50 rounded-lg border border-gray-300 cursor-default outline-offset-0  focus-visible:outline-blue-500 sm:text-sm">
-                          <span className="block truncate">
-                            {selected.name}
-                          </span>
-                          <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <SelectorIcon
-                              className="w-5 h-5 text-gray-400"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        </Listbox.Button>
-                        <Transition
-                          as={Fragment}
-                          leave="transition ease-in duration-100"
-                          leaveFrom="opacity-100"
-                          leaveTo="opacity-0"
-                        >
-                          <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                            {people.map((person, personIdx) => (
-                              <Listbox.Option
-                                key={personIdx}
-                                className={({ active }) =>
-                                  `${
-                                    active
-                                      ? "text-blue-900 bg-blue-100"
-                                      : "text-gray-900"
-                                  }
-                          cursor-default select-none relative py-2 pl-10 pr-4`
-                                }
-                                value={person}
-                              >
-                                {({ selected, active }) => (
-                                  <>
-                                    <span
-                                      className={`${
-                                        selected ? "font-medium" : "font-normal"
-                                      } block truncate`}
-                                    >
-                                      {person.name}
-                                    </span>
-                                    {selected ? (
-                                      <span
-                                        className={`${
-                                          active
-                                            ? "text-blue-500"
-                                            : "text-blue-500"
-                                        }
-                                absolute inset-y-0 left-0 flex items-center pl-3`}
-                                      >
-                                        <CheckIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      </span>
-                                    ) : null}
-                                  </>
-                                )}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </Transition>
-                      </div>
-                    </Listbox>
-                  </div>
-                  <div className="mb-6 w-full">
-                    <label
-                      htmlFor="input-price"
-                      className="block mb-2 text-sm font-medium text-gray-900"
-                    >
-                      Price
-                    </label>
-                    <input
-                      type="text"
-                      id="input-price"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg outline-offset-0 focus:ring-blue-500 focus:outline-blue-500 block w-full p-2.5"
-                    />
-                  </div>
+                  <ComponentSelect title="Catalog" listItem={people}/>
+                  <ComponentInput 
+                    title="Price" 
+                    typeInput="number" 
+                    placehoder="Please input price" 
+                    min={1}
+                    max={100} 
+                  />
                 </div>
 
                 <div className="mb-6">
