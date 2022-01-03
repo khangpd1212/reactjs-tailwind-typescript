@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function HeadingTable({title}: { title: string[] }) {
   return (
     <thead className="bg-gray-50">

@@ -2,7 +2,7 @@ import servicesProduct from "../../services/product.service";
 import "../../styles/toggle.css";
 import IProduct from "../../types/product.type";
 interface StringArray {
-  [index: string]: boolean,
+  [index: string]: boolean;
 }
 interface Props {
   productList: IProduct[];

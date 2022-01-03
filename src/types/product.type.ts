@@ -1,4 +1,5 @@
 export default interface IProduct {
+  [index: string]: {};
   id: string;
   name: string;
   image: string;

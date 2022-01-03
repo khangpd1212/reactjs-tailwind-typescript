@@ -1,24 +1,30 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Dialog, Transition, Listbox } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Dialog, Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-
-const people = [
-  { id: 1, name: 'Durward Reynolds', unavailable: false },
-  { id: 2, name: 'Kenton Towne', unavailable: false },
-  { id: 3, name: 'Therese Wunsch', unavailable: false },
-  { id: 4, name: 'Benedict Kessler', unavailable: true },
-  { id: 5, name: 'Katelyn Rohan', unavailable: false },
-]
+import { onValue } from "firebase/database";
+import { Fragment, useEffect, useState } from "react";
+import servicesCatalog from "services/catalog.service";
+import ICatalog from "types/catalog.type";
+import InputUpload from "./InputUpload";
 
 export default function AddForm() {
   const [open, setOpen] = useState(false);
 
-  const [selected, setSelected] = useState(people[0]);
+  const [selected, setSelected] = useState<ICatalog>();
+  const [catalogList, setCatalogList] = useState<ICatalog[]>([]);
   
   const handleShowModal = () => {
     setOpen(true);
   };
+  
+  useEffect(() => {
+    onValue(servicesCatalog.getAll(), (snapshot) => {
+      const data = snapshot.val();
+      setCatalogList(data);
+      setSelected(data[0]);
+    });
+  }, []);
+
   return (
     <>
       <button
@@ -91,7 +97,7 @@ export default function AddForm() {
                       <div className="relative" id="input-catalog">
                         <Listbox.Button className="relative w-full p-2.5 text-left bg-gray-50 rounded-lg border border-gray-300 cursor-default outline-offset-0  focus-visible:outline-blue-500 sm:text-sm">
                           <span className="block truncate">
-                            {selected.name}
+                            {selected?.name}
                           </span>
                           <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                             <SelectorIcon
@@ -107,7 +113,7 @@ export default function AddForm() {
                           leaveTo="opacity-0"
                         >
                           <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                            {people.map((person, personIdx) => (
+                            {catalogList.map((person, personIdx) => (
                               <Listbox.Option
                                 key={personIdx}
                                 className={({ active }) =>
@@ -182,53 +188,8 @@ export default function AddForm() {
                     placeholder="Please input description..."
                   ></textarea>
                 </div>
-                <div className="mb-6">
-                  <label
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                    htmlFor="upload-image"
-                  >
-                    Cover photo
-                  </label>
-                  <div
-                    className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
-                    id="upload-image"
-                  >
-                    <div className="space-y-1 text-center">
-                      <svg
-                        className="mx-auto h-12 w-12 text-gray-400"
-                        stroke="currentColor"
-                        fill="none"
-                        viewBox="0 0 48 48"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <div className="flex text-sm text-gray-600">
-                        <label
-                          htmlFor="file-upload"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        PNG, JPG, GIF up to 10MB
-                      </p>
-                    </div>
-                  </div>
-                </div>
+
+                <InputUpload title="Upload Image" />
 
                 <div className="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                   <button
