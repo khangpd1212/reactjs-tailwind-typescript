@@ -5,11 +5,11 @@ interface StringArray {
   [index: string]: boolean;
 }
 interface Props {
-  productList: IProduct[];
+  productList: IProduct | undefined;
 }
 export default function MainTable({ productList }: Props): JSX.Element {
 
-  const changeStatus = (e: React.ChangeEvent<HTMLInputElement>, key: number): void => {
+  const changeStatus = (e: React.ChangeEvent<HTMLInputElement>, key: number | string): void => {
     const status = e.target.checked;
     let updates: StringArray = {};
     updates[`/${key}/status`] = status;
@@ -23,13 +23,17 @@ export default function MainTable({ productList }: Props): JSX.Element {
   return (
     <>
       {productList &&
-        productList.map((item, key) => (
+        Object.values(productList).map((item) => (
           <tbody key={item.id}>
             <tr>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 h-10 w-10">
-                    <img className="h-10 w-10 rounded-full" src={item.image} alt={item.image} />
+                    <img
+                      className="h-10 w-10 rounded-full"
+                      src={item.image}
+                      alt={item.image}
+                    />
                   </div>
                 </div>
               </td>
@@ -44,15 +48,15 @@ export default function MainTable({ productList }: Props): JSX.Element {
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <label
-                  htmlFor={item.id}
+                  htmlFor={`checked-${item.id}`}
                   className="relative inline-block w-11 mr-2 align-middle select-none transition duration-200 ease-in"
                 >
                   <input
                     checked={item.status}
                     type="checkbox"
                     name="toggle"
-                    id={item.id}
-                    onChange={(e) => changeStatus(e, key)}
+                    id={`checked-${item.id}`}
+                    onChange={(e) => changeStatus(e, item.id)}
                     className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300"
                   />
                   <div className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></div>
@@ -63,7 +67,10 @@ export default function MainTable({ productList }: Props): JSX.Element {
                   Edit
                 </span>
                 <span> / </span>
-                <span className="text-red-600 hover:text-red-900" onClick={() => handleDeleteProduct(key)}>
+                <span
+                  className="text-red-600 hover:text-red-900"
+                  onClick={() => handleDeleteProduct(item.id)}
+                >
                   Delete
                 </span>
               </td>

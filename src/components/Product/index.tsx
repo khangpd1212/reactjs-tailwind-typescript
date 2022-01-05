@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 import servicesProduct from "../../services/product.service";
 import "../../styles/toggle.css";
 import IProduct from "../../types/product.type";
-import AddForm from "../Form/AddForm";
+import AddForm from "./AddForm";
 import HeadingTable from "../Table/HeadingTable";
 import MainTable from "../Table/MainTable";
+import { mapArray } from "utils/mapArray";
 const title = [
   "Image",
   "Name",
@@ -15,10 +16,11 @@ const title = [
 ]
 
 export default function Product() {
-  const [productList, setProductList] = useState<IProduct[]>([]);
+  const [productList, setProductList] = useState<IProduct>();
   useEffect(() => {
     onValue(servicesProduct.getAll(), (snapshot) => {
-      const data = snapshot.val();
+      const response = snapshot.val();
+      const data = mapArray(response);
       setProductList(data);
     });
   }, []);
