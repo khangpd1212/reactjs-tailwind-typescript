@@ -1,17 +1,24 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { Dialog, Transition } from "@headlessui/react";
 import { onValue } from "firebase/database";
 import React, { Fragment, memo, useEffect, useState } from "react";
 import servicesCatalog from "services/catalog.service";
 import servicesProduct from "services/product.service";
 import ICatalog from "types/catalog.type";
-import {InputComponent, InputUpload, SelectComponent, TextareaComponent} from "components/Form";
+import {
+  InputComponent,
+  InputUpload,
+  SelectComponent,
+  TextareaComponent,
+} from "components/Form";
 import Button from "components/Button";
 import IProduct from "types/product.type";
 import { mapObject } from "utils/mapObject";
-function AddForm() {
-  const [open, setOpen] = useState(false);
-
+type PropsEdit = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  id_product: string;
+};
+function EditForm({ open, setOpen, id_product }: PropsEdit) {
   const [selected, setSelected] = useState<ICatalog>({
     id: "",
     name: "",
@@ -24,28 +31,39 @@ function AddForm() {
     description: "",
     imageUrl: "",
     status: true,
-    id_catalog: selected.id,
+    id_catalog: "",
   });
 
-  // load full data product
+  // get data product id
+  useEffect(() => {
+    if(!id_product) return
+    onValue(servicesProduct.getById(id_product), (snapshot) => {
+      const response = snapshot.val();
+      setInputValue(response);
+
+      return onValue(servicesCatalog.getById(response.id_catalog), (snapshot) => {
+        let data = snapshot.val();
+        data.id = snapshot.key;
+        return setSelected(data);
+      })
+    });
+  }, [id_product]);
+
+  // load full data catalog
   useEffect(() => {
     onValue(servicesCatalog.getAll(), (snapshot) => {
       let response = snapshot.val();
       const data = mapObject(response);
       setCatalogList(data);
-      let keyFirst = Object.keys(data)[0];
-      setSelected(data[keyFirst]);
     });
   }, []);
 
-  // upload file catalog
+  // update field catalog
   useEffect(() => {
     setInputValue({ ...inputValue, id_catalog: selected.id });
   }, [selected.id]);
 
-  const handleChangeInput = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
     setInputValue({
       ...inputValue,
@@ -54,62 +72,44 @@ function AddForm() {
     });
   };
 
-  // upload file image
+  // upload field image
   const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-      const reader = new FileReader();
-      fileList && reader.readAsDataURL(fileList?.[0]);
-      console.log(fileList);
-      reader.addEventListener("load", (event) => {
-        if (!event.target) return;
-        if (typeof event.target.result === "string") {
-          return setInputValue({
-            ...inputValue,
-            imageUrl: event.target.result,
-          });
-        }
-      });   
+    const reader = new FileReader();
+    fileList && reader.readAsDataURL(fileList?.[0]);
+    console.log(fileList);
+    reader.addEventListener("load", (event) => {
+      if (!event.target) return;
+      if (typeof event.target.result === "string") {
+        return setInputValue({
+          ...inputValue,
+          imageUrl: event.target.result,
+        });
+      }
+    });
   };
 
-  console.log(inputValue)
-  const handleAddProduct = () => {
-    servicesProduct.create(inputValue).then(() =>{
-      setOpen(false);
-      setInputValue({
-        name: "",
-        price: 1,
-        description: "",
-        imageUrl: "",
-        status: true,
-        id_catalog: selected.id,
-      });
-    }).catch((err) => console.log(err));
-  };
+  console.log(inputValue);
+  console.log(selected);
 
-  const handleShowModal = () => {
-    setOpen(true);
+  const handleEditProduct = () => {
+    servicesProduct
+      .create(inputValue)
+      .then(() => {
+        setOpen(false);
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleCancel = () => {
     setOpen(false);
-    setInputValue({
-      name: "",
-      price: 1,
-      description: "",
-      imageUrl: "",
-      status: true,
-      id_catalog: selected.id,
+    onValue(servicesProduct.getById(id_product), (snapshot) => {
+      setInputValue(snapshot.val());
     });
-  }
+  };
+
   return (
     <>
-      <button
-        onClick={handleShowModal}
-        className="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-        type="button"
-      >
-        Add product
-      </button>
       <Transition.Root show={open} as={Fragment}>
         <Dialog
           as="div"
@@ -189,7 +189,7 @@ function AddForm() {
                   <Button
                     label="Add"
                     nameStyle="primary"
-                    click={handleAddProduct}
+                    click={handleEditProduct}
                   />
                   <Button
                     label="Cancel"
@@ -205,4 +205,4 @@ function AddForm() {
     </>
   );
 }
-export default memo(AddForm)
+export default memo(EditForm);

@@ -5,11 +5,9 @@ export default interface IProduct {
   //   | number
   //   | boolean
   //   | undefined
-  //   | Blob
-  //   | MediaSource;
   id?: string;
   name: string;
-  nameImage: string;
+  imageUrl: string;
   price: number;
   description: string;
   status: boolean;

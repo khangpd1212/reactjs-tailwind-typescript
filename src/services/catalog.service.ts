@@ -1,20 +1,22 @@
-import { ref, remove, set, update } from "firebase/database";
+import { ref, remove, update, push, child } from "firebase/database";
 import { db } from "../firebase";
 import ICatalog from "../types/catalog.type";
 
-const dbRef = ref(db, "catalogs/");
-class servicesCatalog {
+const servicesCatalog = {
   getAll() {
-    return dbRef;
-  }
-  create(catalog: ICatalog) {
-    return set(dbRef, catalog);
-  }
-  update(updates: object) {
-    return update(dbRef, updates);
-  }
-  delete(key: number) {
-    return remove(ref(db, "catalogs/" + key));
-  }
-}
-export default new servicesCatalog();
+    return ref(db, "catalogs/");
+  },
+  getById(id: string) {
+    return ref(db, "catalogs/" + id);
+  },
+  create(product: Partial<ICatalog>) {
+    return push(child(ref(db), "catalogs/"), product);
+  },
+  update(updates: Partial<ICatalog>) {
+    return update(ref(db, "catalogs/"), updates);
+  },
+  delete(id: string) {
+    return remove(ref(db, "catalogs/" + id));
+  },
+};
+export default servicesCatalog;
