@@ -1,42 +1,38 @@
-import { Dialog, Transition } from "@headlessui/react";
-import { onValue } from "firebase/database";
-import React, { Fragment, memo, useEffect, useState } from "react";
-import servicesCatalog from "services/catalog.service";
-import servicesProduct from "services/product.service";
-import ICatalog from "types/catalog.type";
-import {
-  InputComponent,
-  InputUpload,
-  SelectComponent,
-  TextareaComponent,
-} from "components/Form";
-import Button from "components/Button";
-import IProduct from "types/product.type";
-import { mapObject } from "utils/mapObject";
+import { Dialog, Transition } from '@headlessui/react';
+import Button from 'components/Button';
+import { InputComponent, InputUpload, SelectComponent, TextareaComponent } from 'components/Form';
+import { onValue } from 'firebase/database';
+import React, { Fragment, memo, useEffect, useState } from 'react';
+import servicesCatalog from 'services/catalog.service';
+import servicesProduct from 'services/product.service';
+import ICatalog from 'types/catalog.type';
+import IProduct from 'types/product.type';
+import { mapObject } from 'utils/mapObject';
+
 type PropsEdit = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   id_product: string;
 };
+
 function EditForm({ open, setOpen, id_product }: PropsEdit) {
   const [selected, setSelected] = useState<ICatalog>({
-    id: "",
-    name: "",
+    id: '',
+    name: '',
     status: true,
   });
   const [catalogList, setCatalogList] = useState<ICatalog>();
   const [inputValue, setInputValue] = useState<IProduct>({
-    name: "",
+    name: '',
     price: 1,
-    description: "",
-    imageUrl: "",
+    description: '',
+    imageUrl: '',
     status: true,
-    id_catalog: "",
+    id_catalog: '',
   });
-
   // get data product id
   useEffect(() => {
-    if(!id_product) return
+    if (!id_product) return;
     onValue(servicesProduct.getById(id_product), (snapshot) => {
       const response = snapshot.val();
       setInputValue(response);
@@ -45,7 +41,7 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
         let data = snapshot.val();
         data.id = snapshot.key;
         return setSelected(data);
-      })
+      });
     });
   }, [id_product]);
 
@@ -65,11 +61,17 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name;
-    setInputValue({
-      ...inputValue,
-      [name]: e.target.value,
-      status: true,
-    });
+    if (name === 'price') {
+      setInputValue({
+        ...inputValue,
+        [name]: Number(e.target.value),
+      });
+    } else {
+      setInputValue({
+        ...inputValue,
+        [name]: e.target.value,
+      });
+    }
   };
 
   // upload field image
@@ -77,10 +79,9 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
     const fileList = e.target.files;
     const reader = new FileReader();
     fileList && reader.readAsDataURL(fileList?.[0]);
-    console.log(fileList);
-    reader.addEventListener("load", (event) => {
+    reader.addEventListener('load', (event) => {
       if (!event.target) return;
-      if (typeof event.target.result === "string") {
+      if (typeof event.target.result === 'string') {
         return setInputValue({
           ...inputValue,
           imageUrl: event.target.result,
@@ -89,12 +90,9 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
     });
   };
 
-  console.log(inputValue);
-  console.log(selected);
-
   const handleEditProduct = () => {
     servicesProduct
-      .create(inputValue)
+      .update(inputValue, id_product)
       .then(() => {
         setOpen(false);
       })
@@ -111,11 +109,7 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed z-10 inset-0 overflow-y-auto"
-          onClose={setOpen}
-        >
+        <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
           <form className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <Transition.Child
               as={Fragment}
@@ -130,10 +124,7 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
             </Transition.Child>
 
             {/* This element is to trick the browser into centering the modal contents. */}
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
               &#8203;
             </span>
             <Transition.Child
@@ -183,19 +174,12 @@ function EditForm({ open, setOpen, id_product }: PropsEdit) {
                   title="Upload Image"
                   change={handleChangeImage}
                   imageUrl={inputValue.imageUrl}
+                  ultImage={inputValue.name}
                 />
 
                 <div className="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <Button
-                    label="Add"
-                    nameStyle="primary"
-                    click={handleEditProduct}
-                  />
-                  <Button
-                    label="Cancel"
-                    nameStyle="secondary"
-                    click={handleCancel}
-                  />
+                  <Button label="Add" nameStyle="primary" click={handleEditProduct} />
+                  <Button label="Cancel" nameStyle="secondary" click={handleCancel} />
                 </div>
               </div>
             </Transition.Child>

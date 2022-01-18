@@ -1,6 +1,6 @@
-import { memo } from "react";
+import { memo } from 'react';
 
-function HeadingTable({title}: { title: string[] }) {
+function HeadingTable({ title }: { title: string[] }) {
   return (
     <thead className="bg-gray-50">
       <tr>
@@ -15,10 +15,9 @@ function HeadingTable({title}: { title: string[] }) {
             </th>
           ))}
 
-        <th scope="col" className="relative px-6 py-3">
-        </th>
+        <th scope="col" className="relative px-6 py-3"></th>
       </tr>
     </thead>
   );
 }
-export default memo(HeadingTable)
+export default memo(HeadingTable);

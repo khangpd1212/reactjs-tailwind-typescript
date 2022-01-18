@@ -1,7 +1,7 @@
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
-import { Fragment } from "react";
-import ICatalog from "types/catalog.type";
+import { Listbox, Transition } from '@headlessui/react';
+import { CheckIcon, SelectorIcon } from '@heroicons/react/solid';
+import { Fragment } from 'react';
+import ICatalog from 'types/catalog.type';
 
 interface SelectProps {
   title: string;
@@ -9,29 +9,19 @@ interface SelectProps {
   selected: ICatalog;
   setSelected: React.Dispatch<React.SetStateAction<ICatalog>>;
 }
-export function SelectComponent({
-  title,
-  listItem,
-  selected,
-  setSelected,
-}: SelectProps) {
+export function SelectComponent({ title, listItem, selected, setSelected }: SelectProps) {
+  console.log(selected)
   return (
     <div className="mb-6 w-full">
-      <label
-        htmlFor="input-catalog"
-        className="block mb-2 text-sm font-medium text-gray-900"
-      >
+      <label htmlFor="input-catalog" className="block mb-2 text-sm font-medium text-gray-900">
         {title}
       </label>
       <Listbox value={selected} onChange={setSelected}>
         <div className="relative" id="input-catalog">
           <Listbox.Button className="relative w-full p-2.5 text-left bg-gray-50 rounded-lg border border-gray-300 cursor-default outline-offset-0  focus-visible:outline-blue-500 sm:text-sm">
-            <span className="block truncate">{selected?.name}</span>
+            <span className="block truncate">{selected.name}</span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <SelectorIcon
-                className="w-5 h-5 text-gray-400"
-                aria-hidden="true"
-              />
+              <SelectorIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
             </span>
           </Listbox.Button>
           <Transition
@@ -46,31 +36,28 @@ export function SelectComponent({
                   <Listbox.Option
                     key={index}
                     className={({ active }) =>
-                      `${active ? "text-blue-900 bg-blue-100" : "text-gray-900"}
-                          cursor-default select-none relative py-2 pl-10 pr-4`
+                      `${
+                        active ? 'text-blue-900 bg-blue-100' : 'text-gray-900'
+                      } cursor-default select-none relative py-2 pl-10 pr-4`
                     }
                     value={list}
                   >
-                    {({ selected, active }) => (
-                      <>
-                        <span
-                          className={`${
-                            selected ? "font-medium" : "font-normal"
-                          } block truncate`}
-                        >
-                          {list.name}
-                        </span>
-                        {selected ? (
+                    {({ selected }) => (
+                      console.log(selected),
+                      (
+                        <>
                           <span
-                            className={`${
-                              active ? "text-blue-500" : "text-blue-500"
-                            }
-                                absolute inset-y-0 left-0 flex items-center pl-3`}
+                            className={`${selected ? 'font-medium' : 'font-normal'} block truncate`}
                           >
-                            <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                            {list.name}
                           </span>
-                        ) : null}
-                      </>
+                          {selected ? (
+                            <span className="text-blue-500 absolute inset-y-0 left-0 flex items-center pl-3">
+                              <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                            </span>
+                          ) : null}
+                        </>
+                      )
                     )}
                   </Listbox.Option>
                 ))}

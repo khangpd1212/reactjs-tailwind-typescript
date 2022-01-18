@@ -3,8 +3,9 @@ interface UploadProps {
   title: string;
   imageUrl: string;
   change?: React.ChangeEventHandler<HTMLInputElement>;
+  ultImage: string
 }
-export function InputUpload({ title, change, imageUrl }: UploadProps) {
+export function InputUpload({ title, change, imageUrl, ultImage }: UploadProps) {
   return (
     <div className="mb-6">
       <label
@@ -35,7 +36,7 @@ export function InputUpload({ title, change, imageUrl }: UploadProps) {
                   onChange={change}
                 />
               </label>
-              <img src={imageUrl} alt={imageUrl}/>
+              <img src={imageUrl} alt={ultImage} />
             </>
           ) : (
             <>
